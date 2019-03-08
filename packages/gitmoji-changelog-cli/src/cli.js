@@ -45,7 +45,6 @@ async function main(options = {}) {
     if (changelog.meta.repository) {
       logger.info(changelog.meta.repository.url)
     }
-
     switch (options.format) {
       case 'json':
         fs.writeFileSync(options.output, JSON.stringify(changelog))

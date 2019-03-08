@@ -9,7 +9,7 @@ const { isEmpty } = require('lodash')
 const MARKDOWN_TEMPLATE = path.join(__dirname, 'template.md')
 
 function buildMarkdownFile(changelog = {}, options = {}) {
-  if (options.mode === 'init') {
+  if (options.mode === 'init' || options.mode === 'range') {
     return markdownFromScratch(changelog, options)
   }
   return markdownIncremental(changelog, options)
@@ -32,13 +32,17 @@ function mapCommit(meta, options) {
 function toMarkdown({ meta, changes }, options) {
   const template = fs.readFileSync(MARKDOWN_TEMPLATE, 'utf-8')
   const compileTemplate = handlebars.compile(template)
-  const changelog = update(changes, '[:].groups[:].commits[:]', mapCommit(meta, options))
-
+  /** If there are new commits/changes parse it to markdown. Otherwise, return No changelog given */
+  let changelog = 'No changelog given'
+  if (changes === undefined || changes.length === 0) {
+    return changelog
+  }
+  changelog = update(changes, '[:].groups[:].commits[:]', mapCommit(meta, options))
   return compileTemplate({ changelog })
 }
 
 function markdownFromScratch({ meta, changes }, options) {
-  return promisify(fs.writeFile)(options.output, `# Changelog\n\n${toMarkdown({ meta, changes }, options)}`)
+  return promisify(fs.writeFile)(options.output, `###${meta.versionName}\n\n# Changelog\n\n${toMarkdown({ meta, changes }, options)}`)
 }
 
 function markdownIncremental({ meta, changes }, options) {

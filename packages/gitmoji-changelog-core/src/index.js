@@ -15,7 +15,8 @@ const { groupSentencesByDistance } = require('./utils')
 
 const gitSemverTagsAsync = promisify(gitSemverTags)
 
-const COMMIT_FORMAT = '%n%H%n%an%n%cI%n%s%n%b'
+// const COMMIT_FORMAT = '%n%H%n%an%n%cI%n%s%n%b'
+const COMMIT_FORMAT = '%n%n%an%n%cI%n%s%n%b'
 
 function getCommits(from, to) {
   return new Promise((resolve) => {
@@ -107,7 +108,7 @@ async function generateVersions({ tags, groupSimilarCommits }) {
 }
 
 async function generateChangelog(options = {}) {
-  const { mode, release, groupSimilarCommits } = options
+  const { mode, release, groupSimilarCommits, from, to, versionName } = options
 
   const packageInfo = await getPackageInfo()
 
@@ -127,6 +128,13 @@ async function generateChangelog(options = {}) {
 
   if (mode === 'init') {
     changes = await generateVersions({ tags, groupSimilarCommits })
+  } else if (mode === 'range') {
+    const lastChanges = await generateVersion({
+      groupSimilarCommits,
+      from,
+      to, })
+
+    changes.push(lastChanges)
   } else {
     const lastChanges = await generateVersion({
       groupSimilarCommits,
@@ -148,6 +156,7 @@ async function generateChangelog(options = {}) {
       package: packageInfo,
       repository,
       lastVersion: sanitizeVersion(lastTag),
+      versionName,
     },
     changes: changes.filter(({ groups }) => groups.length),
   }
