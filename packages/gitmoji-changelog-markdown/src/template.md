@@ -1,5 +1,4 @@
 {{#each changelog}}
-<a name="{{version}}"></a>
 ## {{version}}{{#if date}} ({{date}}){{/if}}
 
 {{#each groups}}

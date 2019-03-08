@@ -42,7 +42,7 @@ function toMarkdown({ meta, changes }, options) {
 }
 
 function markdownFromScratch({ meta, changes }, options) {
-  return promisify(fs.writeFile)(options.output, `###${meta.versionName}\n\n# Changelog\n\n${toMarkdown({ meta, changes }, options)}`)
+  return promisify(fs.writeFile)(options.output, `# ${meta.versionName}\n\n# Changelog\n\n${toMarkdown({ meta, changes }, options)}`)
 }
 
 function markdownIncremental({ meta, changes }, options) {
